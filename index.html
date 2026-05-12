@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Type play</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dynamic Gooey Pro - TECH-EVO</title>
+    <style>
+        :root {
+            --bg: #dfdede; 
+            --panel: #dfdede;
+            --text-main: #2a2a2a;
+            --text-sub: #666666;
+            --accent: #008cff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'Microsoft YaHei', sans-serif; 
+            background: var(--bg); color: var(--text-main); margin: 0; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; width: 100vw; overflow: hidden;
+        }
+
+        .container { display: flex; width: 100vw; height: 100vh; gap: 0; max-width: none; }
+
+        .sidebar {
+            flex: 0 0 350px; 
+            background: var(--panel); border-right: 1px solid rgba(0,0,0,0.05);
+            padding: 20px 20px 5px 20px; display: flex; flex-direction: column;
+            position: relative; z-index: 10;
+        }
+
+        .text-input-container {
+            border: 1px solid rgba(0,0,0,0.1); background: #fff;
+            display: flex; flex-direction: column; margin-bottom: 15px;
+        }
+
+        textarea { 
+            width: 100%; height: 80px; padding: 10px; border: none; outline: none; 
+            font-size: 14px; font-weight: bold; font-family: inherit; resize: none;
+            background: transparent;
+        }
+
+        .controls-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .item { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+        label { font-size: 9px; color: var(--text-sub); text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+        label span { color: #000; font-weight: bold; }
+
+        input[type=range] { -webkit-appearance: none; appearance: none; background: #fff; height: 2px; outline: none; width: 100%; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 10px; height: 10px; background: #000; cursor: pointer; }
+        input[type=range]::-moz-range-thumb { width: 10px; height: 10px; background: #000; cursor: pointer; border: none; }
+
+        .frame-slider-container { 
+            margin-top: -12px; padding: 15px 12px; 
+            background: rgba(255,255,255,0.4); 
+            border: 1px solid rgba(0,0,0,0.05); 
+        }
+        
+        .frame-ctrl-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 12px; 
+            margin-top: 10px;
+            height: 24px; 
+        }
+        
+        #frameSlider {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 1px; 
+            background: #000 !important; 
+            outline: none;
+            cursor: pointer;
+            margin: 0;
+        }
+        #frameSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 8px; height: 8px;
+            background: #000; border-radius: 0;
+            cursor: pointer; border: none;
+            margin-top: 0px; 
+        }
+
+        .side-icon-btn {
+            cursor: pointer; 
+            font-size: 11px; 
+            color: #000; 
+            -webkit-user-select: none; user-select: none; 
+            font-weight: bold; 
+            line-height: 1;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 20px; 
+            height: 24px;
+            text-align: center;
+            position: relative;
+            top: -2px; 
+        }
+        
+        #playBtnSide { transform: scaleY(1.5); transform-origin: center; -webkit-transform: scaleY(1.5); -webkit-transform-origin: center; }
+        #pauseBtnSide { transform: scaleY(1); transform-origin: center; -webkit-transform: scaleY(1); -webkit-transform-origin: center; }
+
+        .font-upload-area { display: flex !important; align-items: center !important; gap: 6px !important; background: transparent !important; border: none !important; }
+        .font-upload-wrapper { cursor: pointer !important; display: flex !important; align-items: center !important; color: #000 !important; gap: 3px !important; transition: opacity 0.2s; background: transparent !important; border: none !important; padding: 0 !important; }
+        .font-upload-wrapper:hover { opacity: 0.6; }
+        .font-upload-wrapper span { font-size: 10px !important; font-weight: normal !important; text-transform: none !important; }
+
+        #fontStatus { display: none; align-items: center; gap: 4px; background: transparent !important; border: none !important; }
+        #fontNameText { font-size: 9px; color: var(--text-sub); text-transform: uppercase; font-weight: normal; }
+        #clearFont { cursor: pointer; font-size: 12px; color: #999; font-family: Arial; line-height: 1; margin-left: 1px; }
+        #fontFile { display: none !important; }
+
+        .tab-group { display: flex; border: 1px solid rgba(0,0,0,0.1); background: #fff; }
+        .tab { flex: 1; padding: 10px 0; text-align: center; font-size: 10px; cursor: pointer; text-transform: uppercase; color: var(--text-sub); }
+        .tab.active { background: #000; color: #fff; }
+
+        .main-content { flex: 1; background: transparent; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        #canvas-wrapper { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+
+        svg { display: block; width: 100%; height: 100%; background: #fff; shape-rendering: geometricPrecision; cursor: default !important; }
+        #gooeyGroup { transform: translateZ(0); -webkit-transform: translateZ(0); will-change: transform; pointer-events: none; }
+
+        input[type=color] { -webkit-appearance: none; appearance: none; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; background: #fff; padding: 2px; }
+        input[type=color]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type=color]::-webkit-color-swatch { border: none; }
+
+        .color-matrix-container { display: flex; gap: 4px; justify-content: space-between; }
+        .color-column { flex: 1; display: flex; flex-direction: column; gap: 5px; align-items: center; }
+        .color-column input[type=color] { width: 100%; height: 24px; }
+        
+        .color-column input[type=text] { 
+            width: 100%; height: 22px; font-size: 10px; border: 1px solid rgba(0,0,0,0.1); outline: none; 
+            text-transform: uppercase; font-family: 'Monaco', 'Consolas', monospace; text-align: center; font-weight: 500; color: #000;
+        }
+
+        .color-row-bg { display: flex; gap: 6px; align-items: center; width: 100%; }
+        .color-row-bg input[type=color] { flex: 1; height: 28px; } 
+        .color-row-bg input[type=text] { 
+            flex: 1; height: 28px; font-size: 11px; border: 1px solid rgba(0,0,0,0.1); outline: none; 
+            text-transform: uppercase; font-family: 'Monaco', 'Consolas', monospace; text-align: center; font-weight: 500; color: #000;
+        }
+
+        .bottom-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-bottom: 2px; }
+        .btn-row { display: flex; gap: 4px; }
+        .btn-row button { flex: 1; padding: 8px 0; font-size: 9px; }
+        button { padding: 12px; border: 1px solid #000; background: #1a1a1a; color: #fff; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 10px; font-weight: bold;}
+        .btn-secondary { background: #ccc !important; color: #000 !important; border: none !important; }
+
+        #textStrokeToggle.active-toggle, #globalStrokeToggle.active-toggle { background: #ffffff !important; color: #000000 !important; border: none !important; }
+
+        .copyright { font-size: 9px; color: var(--text-sub); text-align: center; opacity: 0.7; margin-top: 5px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <label style="margin-bottom: 10px;">
+            Input Content / 文字内容
+            <div class="font-upload-area">
+                <div id="fontStatus">
+                    <span id="fontNameText">FONT</span>
+                    <span id="clearFont" onclick="resetFont(event)">×</span>
+                </div>
+                <label for="fontFile" class="font-upload-wrapper">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="background:none !important;">
+                        <line x1="4" y1="21" x2="20" y2="21"></line>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Aa</span>
+                    <input type="file" id="fontFile" accept=".ttf,.otf">
+                </label>
+            </div>
+        </label>
+        <div class="text-input-container">
+            <textarea id="textInput" spellcheck="false">OH YES</textarea>
+        </div>
+
+        <div class="item" style="margin-bottom: 15px;">
+            <label>Canvas Ratio / 画布比例</label>
+            <div class="tab-group">
+                <div id="ratio-full" class="tab active" onclick="setRatio('full')">Full</div>
+                <div id="ratio-34" class="tab" onclick="setRatio('3:4')">3:4</div>
+            </div>
+        </div>
+
+        <div class="controls-group">
+            <div class="item">
+                <label>Motion Speed / 游荡速度 <span id="speedVal">1.0</span></label>
+                <input type="range" id="simSpeed" min="0.1" max="5" step="0.1" value="1.0">
+            </div>
+            <div class="item">
+                <label>Gooey Blur / 融球液化度 <span id="blurVal">15</span></label>
+                <input type="range" id="globalBlur" min="5" max="80" value="15">
+            </div>
+            <div class="item">
+                <label>Font Size / 字体大小 <span id="sizeVal">280</span></label>
+                <input type="range" id="fontSize" min="100" max="600" value="280">
+            </div>
+            <div class="item">
+                <label>Font Weight / 字体粗细 <span id="weightVal">900</span></label>
+                <input type="range" id="fontWeight" min="100" max="900" step="100" value="900">
+            </div>
+
+            <div class="item">
+                <label>Stroke & Edge / 描边与轮廓</label>
+                <div class="btn-row">
+                    <button id="textStrokeToggle" onclick="toggleTextStroke()" style="font-size: 7.5px;">文字描边</button>
+                    <button id="globalStrokeToggle" onclick="toggleGlobalStroke()" style="font-size: 7.5px;">整体轮廓</button>
+                </div>
+            </div>
+
+            <div id="textStrokeWidthContainer" class="item" style="display: none; margin-top: -5px;">
+                <label>Text Stroke Width / 文字描边粗细 <span id="textStrokeVal">2</span></label>
+                <input type="range" id="textStrokeWidth" min="1" max="20" value="2">
+            </div>
+
+            <div id="globalStrokeWidthContainer" class="item" style="display: none; margin-top: -5px;">
+                <label>Global Edge Width / 整体轮廓粗细 <span id="globalStrokeVal">2</span></label>
+                <input type="range" id="globalStrokeWidth" min="1" max="10" step="0.5" value="2">
+            </div>
+
+            <div class="item">
+                <label>Font Colors / 字体色彩 (5色循环)</label>
+                <div class="color-matrix-container">
+                    <div class="color-column"><input type="color" class="f-color-pick" data-idx="0" value="#ff0055"><input type="text" class="f-hex-input" data-idx="0" value="#FF0055"></div>
+                    <div class="color-column"><input type="color" class="f-color-pick" data-idx="1" value="#0077ff"><input type="text" class="f-hex-input" data-idx="1" value="#0077FF"></div>
+                    <div class="color-column"><input type="color" class="f-color-pick" data-idx="2" value="#00ff44"><input type="text" class="f-hex-input" data-idx="2" value="#00FF44"></div>
+                    <div class="color-column"><input type="color" class="f-color-pick" data-idx="3" value="#ffaa00"><input type="text" class="f-hex-input" data-idx="3" value="#FFAA00"></div>
+                    <div class="color-column"><input type="color" class="f-color-pick" data-idx="4" value="#ff00ff"><input type="text" class="f-hex-input" data-idx="4" value="#FF00FF"></div>
+                </div>
+            </div>
+
+            <div class="item">
+                <label>Canvas BG / 背景颜色</label>
+                <div class="color-row-bg">
+                    <input type="color" id="bgColor" value="#f9f095">
+                    <input type="text" id="bgHexInput" value="#F9F095">
+                </div>
+            </div>
+
+            <div class="frame-slider-container">
+                <label>Motion Frames / 动态进度 <span id="timeVal">0.00s / 5.00s</span></label>
+                <div class="frame-ctrl-row">
+                    <span id="playBtnSide" class="side-icon-btn" onclick="startAnim()">▶</span>
+                    <input type="range" id="frameSlider" min="0" max="1000" step="1" value="0">
+                    <span id="pauseBtnSide" class="side-icon-btn" onclick="stopAnim()">||</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-actions">
+            <label style="margin-bottom: 4px; margin-top: 16px;">Export / 导出渲染</label>
+            <div class="btn-row">
+                <button onclick="exportImage('jpg')">JPG</button>
+                <button onclick="exportImage('png')">PNG</button>
+                <button id="recordBtn" onclick="toggleRecord()">MP4</button>
+            </div>
+            <div class="btn-row"><button onclick="randomizeParams()" class="btn-secondary">随机效果功能</button></div>
+            <div class="copyright">© 2026 Gooey Path by Type Play</div>
+        </div>
+    </div>
+
+    <div class="main-content" id="main-container">
+        <div id="canvas-wrapper">
+            <svg id="canvasSVG" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- 将字体注入到此，兼容 Safari / Chrome 的跨域与环境隔离问题 -->
+                    <style id="svgCustomFont"></style>
+                    <filter id="metaball-filter" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" id="svgBlur" />
+                        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 70 -28" result="goo" id="svgContrast" />
+                        <feMorphology in="goo" operator="dilate" radius="0" result="dilated" id="svgMorph" />
+                        <feColorMatrix in="dilated" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="stroke_base" />
+                        <feMerge><feMergeNode in="stroke_base" id="mergeNodeStroke" /><feMergeNode in="goo" /></feMerge>
+                    </filter>
+                </defs>
+                <rect id="svgBg" width="100%" height="100%" fill="#f9f095" />
+                <g filter="url(#metaball-filter)" id="gooeyGroup"></g>
+            </svg>
+        </div>
+    </div>
+</div>
+<canvas id="exportCanvas" style="display:none;"></canvas>
+<script>
+    let currentW = 900, currentH = 1200;
+    let currentFontColors =['#ff0055', '#0077ff', '#00ff44', '#ffaa00', '#ff00ff'];
+    let particles =[], isPaused = false, currentRatio = 'full', isRecording = false;
+    let customFont = 'Arial, sans-serif'; 
+    let customFontDataUrl = ''; // Base64 font 跨端渲染专用变量
+    let globalFrame = 0;
+    
+    const svg = document.getElementById('canvasSVG'), gooeyGroup = document.getElementById('gooeyGroup');
+    const textInput = document.getElementById('textInput'), fontFile = document.getElementById('fontFile');
+    const frameSlider = document.getElementById('frameSlider'), timeValText = document.getElementById('timeVal');
+    const mainContainer = document.getElementById('main-container'), canvasWrapper = document.getElementById('canvas-wrapper');
+    const exportCanvas = document.getElementById('exportCanvas'), eCtx = exportCanvas.getContext('2d'), svgBg = document.getElementById('svgBg');
+
+    const state = { blur: 15, speed: 1.0, fontSize: 280, fontWeight: 900, hasTextStroke: false, textStrokeWidth: 2, hasGlobalStroke: false, globalStrokeWidth: 2, bg: '#f9f095' };
+
+    fontFile.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            // 将字体读取为 Data URL，解决外部字体在 SVG 导出图片时的空白与跨域问题
+            customFontDataUrl = event.target.result;
+            const fontName = 'CustomFont_' + Date.now();
+            
+            let styleTag = document.getElementById('svgCustomFont');
+            if (styleTag) styleTag.textContent = `@font-face { font-family: '${fontName}'; src: url(${customFontDataUrl}); }`;
+
+            const fontFace = new FontFace(fontName, `url(${customFontDataUrl})`);
+            fontFace.load().then((loadedFace) => {
+                if(document.fonts) document.fonts.add(loadedFace);
+                customFont = fontName;
+                document.getElementById('fontNameText').innerText = file.name.substring(0, 5);
+                document.getElementById('fontStatus').style.display = 'flex'; 
+                generateParticles();
+            }).catch(err => {
+                // Safari Fallback
+                customFont = fontName;
+                document.getElementById('fontNameText').innerText = file.name.substring(0, 5);
+                document.getElementById('fontStatus').style.display = 'flex';
+                setTimeout(generateParticles, 300);
+            });
+        };
+        reader.readAsDataURL(file);
+    };
+
+    function resetFont(e) { 
+        e.preventDefault(); 
+        customFont = 'Arial, sans-serif'; 
+        customFontDataUrl = '';
+        let styleTag = document.getElementById('svgCustomFont');
+        if (styleTag) styleTag.textContent = '';
+        fontFile.value = ""; 
+        document.getElementById('fontStatus').style.display = 'none'; 
+        generateParticles(); 
+    }
+
+    class Particle {
+        constructor(char, index, color) {
+            this.char = char; this.index = index; this.color = color;
+            this.offX = Math.random() * Math.PI * 2;
+            this.offY = Math.random() * Math.PI * 2;
+            this.freqX = Math.floor(Math.random() * 2) + 1;
+            this.freqY = Math.floor(Math.random() * 2) + 1;
+            this.createSVGElement();
+        }
+        createSVGElement() {
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("text-anchor", "middle"); text.setAttribute("dominant-baseline", "middle");
+            text.setAttribute("fill", this.color); text.textContent = this.char;
+            this.element = text; gooeyGroup.appendChild(text);
+        }
+        getPos(frame) {
+            const angle = (frame / 1000) * Math.PI * 2;
+            const margin = 100;
+            const rangeX = currentW - margin * 2; const rangeY = currentH - margin * 2;
+            return {
+                x: margin + rangeX * (0.5 + 0.4 * Math.sin(this.offX + angle * this.freqX)),
+                y: margin + rangeY * (0.5 + 0.4 * Math.cos(this.offY + angle * this.freqY))
+            };
+        }
+        update(frame) {
+            const pos = this.getPos(frame);
+            this.x = pos.x; this.y = pos.y;
+        }
+        draw() {
+            if (this.element) {
+                this.element.setAttribute("x", this.x); this.element.setAttribute("y", this.y);
+                this.element.setAttribute("font-size", state.fontSize + "px");
+                this.element.setAttribute("font-weight", state.fontWeight);
+                this.element.style.fontFamily = `'${customFont}', sans-serif`;
+                if(state.hasTextStroke) { this.element.setAttribute("stroke", "#000000"); this.element.setAttribute("stroke-width", state.textStrokeWidth); }
+                else { this.element.removeAttribute("stroke"); this.element.removeAttribute("stroke-width"); }
+            }
+        }
+    }
+
+    function generateParticles() {
+        gooeyGroup.innerHTML = ''; particles =[];
+        const chars = textInput.value.replace(/\s+/g, '').split('');
+        chars.forEach((char, index) => { particles.push(new Particle(char, index, currentFontColors[index % currentFontColors.length])); });
+        updateBlurEffect(); 
+        updateFrame(globalFrame);
+    }
+
+    function updateBlurEffect() {
+        const baseSize = 280;
+        const scaleRatio = state.fontSize / baseSize;
+        const effectiveBlur = state.blur * scaleRatio;
+        document.getElementById('svgBlur').setAttribute('stdDeviation', effectiveBlur);
+    }
+
+    function updateFrame(f) { 
+        globalFrame = f; 
+        particles.forEach(p => { p.update(globalFrame); p.draw(); }); 
+        timeValText.innerText = ((globalFrame % 1001) / 1000 * 5).toFixed(2) + "s / 5.00s";
+    }
+
+    frameSlider.oninput = (e) => { isPaused = true; updateFrame(parseInt(e.target.value)); };
+    function startAnim() { isPaused = false; }
+    function stopAnim() { isPaused = true; }
+
+    function animate() {
+        if (!isPaused) { 
+            globalFrame = (globalFrame + state.speed * 2) % 1001; 
+            frameSlider.value = Math.floor(globalFrame); 
+            updateFrame(globalFrame); 
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function exportImage(fmt) {
+        const isPNG = fmt === 'png'; const scaleFactor = 3;
+        exportCanvas.width = currentW * scaleFactor; exportCanvas.height = currentH * scaleFactor;
+        const originalBg = svgBg.getAttribute('fill');
+        if (isPNG) svgBg.setAttribute('fill', 'none'); 
+
+        // 兼容 Safari：画布 drawImage 强校验 SVG 根节点必须存在固定宽高
+        svg.setAttribute('width', currentW);
+        svg.setAttribute('height', currentH);
+        const svgData = new XMLSerializer().serializeToString(svg);
+        svg.removeAttribute('width');
+        svg.removeAttribute('height');
+
+        const url = URL.createObjectURL(new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' }));
+        const img = new Image();
+        img.onload = () => {
+            eCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+            if (!isPNG) { eCtx.fillStyle = state.bg; eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height); }
+            eCtx.drawImage(img, 0, 0, exportCanvas.width, exportCanvas.height);
+            const link = document.createElement('a');
+            link.download = `Gooey-Design-${Date.now()}.${fmt}`;
+            link.href = exportCanvas.toDataURL(isPNG ? 'image/png' : 'image/jpeg', 1.0);
+            link.click(); svgBg.setAttribute('fill', originalBg); URL.revokeObjectURL(url);
+        };
+        img.src = url;
+    }
+
+    // --- 极速录制引擎：优化渲染速度、跨端无缝循环及自动格式降级 ---
+    async function toggleRecord() {
+        if (isRecording) return;
+        const btn = document.getElementById('recordBtn');
+
+        // 环境兼容校验
+        if (!exportCanvas.captureStream && !exportCanvas.mozCaptureStream) {
+            alert("您的浏览器环境不支持视频录制流 (CaptureStream)，请尝试使用最新版 Chrome 或 Safari。");
+            return;
+        }
+        if (typeof MediaRecorder === 'undefined') {
+            alert("您的浏览器不支持视频录制核心组件 (MediaRecorder API)。");
+            return;
+        }
+
+        isRecording = true;
+        
+        const FPS = 30; 
+        const DURATION = 5; 
+        const totalFramesToCapture = FPS * DURATION; 
+        const renderScale = 1.2; 
+
+        exportCanvas.width = currentW * renderScale;
+        exportCanvas.height = currentH * renderScale;
+
+        const stream = exportCanvas.captureStream ? exportCanvas.captureStream(FPS) : exportCanvas.mozCaptureStream(FPS);
+        
+        // 动态支持度匹配，Safari 与 Chrome 存在不同的可用视频容器编码
+        let mimeType = '';
+        const types =['video/mp4;codecs=avc1.42E01E', 'video/mp4', 'video/webm;codecs=h264', 'video/webm'];
+        if (typeof MediaRecorder.isTypeSupported === 'function') {
+            for (let t of types) {
+                if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break; }
+            }
+        } else {
+            mimeType = 'video/mp4'; 
+        }
+
+        let recorder;
+        try {
+            recorder = new MediaRecorder(stream, mimeType ? { mimeType, videoBitsPerSecond: 15000000 } : { videoBitsPerSecond: 15000000 });
+        } catch(e) {
+            try {
+                // 深度异常后备方案
+                recorder = new MediaRecorder(stream);
+                mimeType = '';
+            } catch(e2) {
+                alert("录制引擎初始化失败，可能系统版本不兼容。");
+                btn.innerText = "MP4";
+                isRecording = false;
+                return;
+            }
+        }
+
+        const chunks =[];
+        recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+        recorder.onstop = () => {
+            // Windows Chrome 可能回退到 WebM，通过检测编码输出安全的后缀以免文件损坏
+            const finalMime = recorder.mimeType || mimeType || 'video/mp4';
+            const ext = finalMime.includes('webm') ? 'webm' : 'mp4';
+            
+            const blob = new Blob(chunks, { type: finalMime });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Gooey_Loop_5s.${ext}`;
+            link.click();
+            btn.innerText = "MP4";
+            isRecording = false;
+        };
+
+        recorder.start();
+
+        const effectiveBlur = state.blur * (state.fontSize / 280);
+        const fontStyle = customFontDataUrl ? `<style>@font-face { font-family: '${customFont}'; src: url(${customFontDataUrl}); }</style>` : '';
+        const header = `<svg xmlns="http://www.w3.org/2000/svg" width="${currentW*renderScale}" height="${currentH*renderScale}" viewBox="0 0 ${currentW} ${currentH}">
+            <defs>${fontStyle}<filter id="f" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="${effectiveBlur}" result="b" />
+            <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 70 -28" result="g" />
+            <feMorphology in="g" operator="dilate" radius="${state.hasGlobalStroke ? state.globalStrokeWidth : 0}" result="d" />
+            <feColorMatrix in="d" mode="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" result="s" />
+            <feMerge><feMergeNode in="${state.hasGlobalStroke ? 's' : 'none'}" /><feMergeNode in="g" /></feMerge></filter></defs>
+            <rect width="100%" height="100%" fill="${state.bg}" /><g filter="url(#f)">`;
+        const footer = `</g></svg>`;
+
+        for (let i = 0; i < totalFramesToCapture; i++) {
+            const logicFrame = (i / totalFramesToCapture) * 1000;
+            
+            await new Promise((resolve) => {
+                let textElements = "";
+                const strokeAttr = state.hasTextStroke ? `stroke="#000000" stroke-width="${state.textStrokeWidth}"` : "";
+                const fontStyles = `font-size:${state.fontSize}px;font-weight:${state.fontWeight};font-family:'${customFont}', sans-serif`;
+                
+                for (let j = 0; j < particles.length; j++) {
+                    const pos = particles[j].getPos(logicFrame);
+                    textElements += `<text x="${pos.x}" y="${pos.y}" text-anchor="middle" dominant-baseline="middle" fill="${particles[j].color}" style="${fontStyles}" ${strokeAttr}>${particles[j].char}</text>`;
+                }
+
+                const svgXML = header + textElements + footer;
+                const url = URL.createObjectURL(new Blob([svgXML], {type: 'image/svg+xml;charset=utf-8'}));
+                const img = new Image();
+                img.onload = () => {
+                    eCtx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+                    eCtx.drawImage(img, 0, 0, exportCanvas.width, exportCanvas.height);
+                    URL.revokeObjectURL(url);
+                    resolve();
+                };
+                img.onerror = () => {
+                    // 防止 Safari 某帧崩溃卡死
+                    URL.revokeObjectURL(url);
+                    resolve();
+                };
+                img.src = url;
+            });
+            
+            if(i % 5 === 0) btn.innerText = `${Math.floor((i / totalFramesToCapture) * 100)}%`;
+        }
+
+        recorder.stop();
+    }
+
+    function toggleTextStroke() { state.hasTextStroke = !state.hasTextStroke; state.hasGlobalStroke = false; updateStrokeUI(); }
+    function toggleGlobalStroke() { state.hasGlobalStroke = !state.hasGlobalStroke; state.hasTextStroke = false; updateStrokeUI(); }
+    function updateStrokeUI() {
+        const tBtn = document.getElementById('textStrokeToggle'), tSlider = document.getElementById('textStrokeWidthContainer');
+        const gBtn = document.getElementById('globalStrokeToggle'), gSlider = document.getElementById('globalStrokeWidthContainer');
+        const morph = document.getElementById('svgMorph'), node = document.getElementById('mergeNodeStroke');
+        state.hasTextStroke ? (tBtn.classList.add('active-toggle'), tSlider.style.display = 'flex') : (tBtn.classList.remove('active-toggle'), tSlider.style.display = 'none');
+        state.hasGlobalStroke ? (gBtn.classList.add('active-toggle'), gSlider.style.display = 'flex', morph.setAttribute('radius', state.globalStrokeWidth), node.setAttribute('in', 'stroke_base')) : (gBtn.classList.remove('active-toggle'), gSlider.style.display = 'none', morph.setAttribute('radius', 0), node.setAttribute('in', 'none'));
+        updateFrame(globalFrame);
+    }
+
+    document.querySelectorAll('.f-color-pick').forEach(el => { el.oninput = e => { const idx = e.target.dataset.idx; const c = e.target.value; currentFontColors[idx] = c; document.querySelector(`.f-hex-input[data-idx="${idx}"]`).value = c.toUpperCase(); generateParticles(); }; });
+    document.querySelectorAll('.f-hex-input').forEach(el => { el.oninput = e => { const idx = e.target.dataset.idx; const c = e.target.value; if(c.length>=3){ currentFontColors[idx] = c; document.querySelector(`.f-color-pick[data-idx="${idx}"]`).value = c; generateParticles(); } }; });
+
+    function setRatio(r) {
+        currentRatio = r; document.getElementById('ratio-full').classList.toggle('active', r === 'full'); document.getElementById('ratio-34').classList.toggle('active', r === '3:4');
+        const cW = mainContainer.clientWidth, cH = mainContainer.clientHeight;
+        if (r === '3:4') { mainContainer.style.backgroundColor = '#000'; currentH = cH * 0.85; currentW = currentH * 0.75; if(currentW > cW * 0.9) { currentW = cW * 0.9; currentH = currentW / 0.75; } canvasWrapper.style.width = currentW + 'px'; canvasWrapper.style.height = currentH + 'px'; svg.style.boxShadow = '0 0 50px rgba(0,0,0,0.5)'; }
+        else { mainContainer.style.backgroundColor = 'transparent'; currentW = cW; currentH = cH; canvasWrapper.style.width = '100%'; canvasWrapper.style.height = '100%'; svg.style.boxShadow = 'none'; }
+        svg.setAttribute("viewBox", `0 0 ${currentW} ${currentH}`); updateFrame(globalFrame);
+    }
+
+    function randomizeParams() {
+        const randomHex = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        state.speed = Math.random() * 2 + 0.5; state.fontSize = Math.floor(Math.random() * 300 + 150); state.bg = randomHex();
+        document.getElementById('simSpeed').value = state.speed.toFixed(1); document.getElementById('fontSize').value = state.fontSize;
+        document.getElementById('bgColor').value = state.bg; svgBg.setAttribute('fill', state.bg);
+        document.querySelectorAll('.f-color-pick').forEach((el, i) => { const c = randomHex(); el.value = c; currentFontColors[i] = c; });['simSpeed', 'fontSize', 'globalBlur', 'bgColor'].forEach(id => { const e = document.getElementById(id); if(e.oninput) e.oninput({target: e}); });
+        generateParticles();
+    }
+
+    textInput.oninput = generateParticles;
+    document.getElementById('simSpeed').oninput = e => { state.speed = parseFloat(e.target.value); document.getElementById('speedVal').innerText = state.speed.toFixed(1); };
+    document.getElementById('fontSize').oninput = e => { state.fontSize = parseInt(e.target.value); document.getElementById('sizeVal').innerText = state.fontSize; updateBlurEffect(); updateFrame(globalFrame); };
+    document.getElementById('fontWeight').oninput = e => { state.fontWeight = parseInt(e.target.value); document.getElementById('weightVal').innerText = state.fontWeight; updateFrame(globalFrame); };
+    document.getElementById('textStrokeWidth').oninput = e => { state.textStrokeWidth = parseInt(e.target.value); document.getElementById('textStrokeVal').innerText = state.textStrokeWidth; updateFrame(globalFrame); };
+    document.getElementById('globalStrokeWidth').oninput = e => { state.globalStrokeWidth = parseFloat(e.target.value); document.getElementById('globalStrokeVal').innerText = state.globalStrokeWidth; if(state.hasGlobalStroke) document.getElementById('svgMorph').setAttribute('radius', state.globalStrokeWidth); };
+    document.getElementById('globalBlur').oninput = e => { state.blur = parseFloat(e.target.value); document.getElementById('blurVal').innerText = state.blur; updateBlurEffect(); };
+    document.getElementById('bgColor').oninput = e => { state.bg = e.target.value; svgBg.setAttribute('fill', state.bg); document.getElementById('bgHexInput').value = state.bg.toUpperCase(); };
+
+    window.addEventListener('resize', () => setRatio(currentRatio));
+    setTimeout(() => { setRatio('full'); generateParticles(); animate(); }, 100);
+</script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
